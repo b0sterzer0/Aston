@@ -1,6 +1,5 @@
 package Module1;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +18,14 @@ public abstract class AbstractCustomHashMap<K, V> implements Map<K, V> {
     public abstract V getOrDefault(Object key, V defaultValue);
 
     public abstract int size();
+
+    public abstract Set<K> keySet();
+
+    public abstract List<V> values();
+
+    public abstract void clear();
+
+    public abstract boolean isEmpty();
 
     @Override
     public void forEach(BiConsumer action) {
@@ -64,11 +71,6 @@ public abstract class AbstractCustomHashMap<K, V> implements Map<K, V> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
     public boolean containsKey(Object key) {
         return false;
     }
@@ -81,21 +83,6 @@ public abstract class AbstractCustomHashMap<K, V> implements Map<K, V> {
     @Override
     public void putAll(Map m) {
 
-    }
-
-    @Override
-    public void clear() {
-
-    }
-
-    @Override
-    public Set keySet() {
-        return Set.of();
-    }
-
-    @Override
-    public Collection values() {
-        return List.of();
     }
 
     @Override

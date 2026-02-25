@@ -1,17 +1,25 @@
 package Module1;
 
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
+/**
+ * Реализация хэш-таблицы (HashMap) с разрешением коллизий методом цепочек.
+ * Поддерживает null-ключи (всегда помещаются в бакет с индексом 0).
+ * Не является потокобезопасной.
+ *
+ * @param <K> тип ключей
+ * @param <V> тип значений
+ */
 public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
     static final int DEFAULT_INITIAL_CAPACITY = 16;
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int MAX_CAPACITY = 1 << 30;
 
-    Node<K, V>[] buckets;
-    int size = 0;
-    float loadFactor;
-    int capacity;
+    private Node<K, V>[] buckets;
+    private int size = 0;
+    private float loadFactor;
+    private int capacity;
+    private Set<K> keySet;
 
     public CustomHashMap() {
         this.capacity = DEFAULT_INITIAL_CAPACITY;
@@ -37,22 +45,35 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
         initBuckets();
     }
 
+    /**
+     * Вычисляет хэш-код ключа с дополнительным перемешиванием битов.
+     * Для null-ключа возвращает 0.
+     */
     static final int hash(Object key) {
         if (key == null) return 0;
         int h = key.hashCode();
         return h ^ (h >>> 16);
     }
 
+    /** Инициализирует массив бакетов текущей вместимостью. */
     private void initBuckets() {
         this.buckets = new Node[this.capacity];
     }
 
+    /**
+     * Вычисляет индекс бакета для ключа.
+     * Для null-ключа всегда возвращает 0.
+     */
     private int getBucketIndex(Object key) {
         if (key == null) return 0;
         int hash = hash(key);
         return (this.capacity - 1) & hash;
     }
 
+    /**
+     * Увеличивает вместимость массива бакетов вдвое и перераспределяет все элементы.
+     * Вызывается автоматически при достижении порога (size > buckets.length * loadFactor).
+     */
     private void resize() {
         this.capacity *= 2;
         Node<K,V>[] newBuckets = new Node[this.capacity];
@@ -79,6 +100,55 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
     }
 
     @Override
+    public void clear() {
+        for (int i = 0; i < this.buckets.length; i++) {
+            this.buckets[i] = null;
+        }
+        this.size = 0;
+        this.keySet = null;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.size == 0;
+    }
+
+    /**
+     * Возвращает неизменяемое множество всех ключей хэш-таблицы
+     */
+    @Override
+    public Set<K> keySet() {
+        if (this.keySet == null) {
+            this.keySet = new HashSet<>();
+            for (Node<K, V> node : this.buckets) {
+                while (node != null) {
+                    keySet.add(node.key);
+                    node = node.next;
+                }
+            }
+        }
+        return Set.copyOf(this.keySet);
+    }
+
+    /**
+     * Возвращает неизменяемый список всех значений ключей хэш-таблицы
+     */
+    @Override
+    public List<V> values() {
+        List<V> values = new ArrayList<>();
+        for (Node<K, V> node : this.buckets) {
+            while (node != null) {
+                values.add(node.value);
+                node = node.next;
+            }
+        }
+        return List.copyOf(values);
+    }
+
+    /**
+     * Возвращает значение, связанное с указанным ключом. Если нет такого ключа - null
+     */
+    @Override
     public V get(Object key) {
         V result = null;
         int keyHash = hash(key);
@@ -97,12 +167,19 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
         return result;
     }
 
+    /**
+     * Возвращает значение по ключу или значение по умолчанию, если ключ не найден.
+     */
     @Override
     public V getOrDefault(Object key, V defaultValue) {
         V result = get(key);
         return result == null ? defaultValue : result;
     }
 
+    /**
+     * Добавляет пару "ключ-значение" в хэш-таблицу.
+     * Если ключ уже существует, заменяет соответствующее значение.
+     */
     @Override
     public V put(K key, V value) {
         int bucketIndex = getBucketIndex(key);
@@ -127,12 +204,18 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
 
         if (this.buckets[bucketIndex] == null) {
             this.buckets[bucketIndex] = new Node<>(keyHash, key, value, null);
-        } else prevNode.next = new Node<>(keyHash, key, value, null);
+        } else {
+            prevNode.next = new Node<>(keyHash, key, value, null);
+        }
 
         this.size++;
+        this.keySet = null;
         return value;
     }
 
+    /**
+     * Удаляет элемент по ключу и возвращает его значение. Если ключ не найден возвращает null
+     */
     @Override
     public V remove(Object key) {
         V value = null;
@@ -148,15 +231,19 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
                 if (prevNode == null) this.buckets[bucketIndex] = currentNode.next;
                 else prevNode.next = currentNode.next;
                 this.size--;
+                this.keySet = null;
                 break;
             }
             prevNode = currentNode;
             currentNode = currentNode.next;
         }
-
         return value;
     }
 
+    /**
+     * Внутренний класс, представляющий узел связного списка.
+     * Хранит пару "ключ-значение", хэш ключа и ссылку на следующий узел.
+     */
     static class Node<K, V> implements Map.Entry<K, V> {
         final int hash;
         private final K key;
