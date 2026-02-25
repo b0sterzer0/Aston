@@ -16,10 +16,9 @@ public abstract class AbstractCustomHashMap<K, V> implements Map<K, V> {
 
     public abstract V remove(Object key);
 
-    @Override
-    public V getOrDefault(Object key, Object defaultValue) {
-        return null;
-    }
+    public abstract V getOrDefault(Object key, V defaultValue);
+
+    public abstract int size();
 
     @Override
     public void forEach(BiConsumer action) {
@@ -62,11 +61,6 @@ public abstract class AbstractCustomHashMap<K, V> implements Map<K, V> {
     @Override
     public V merge(Object key, Object value, BiFunction remappingFunction) {
         return null;
-    }
-
-    @Override
-    public int size() {
-        return 0;
     }
 
     @Override

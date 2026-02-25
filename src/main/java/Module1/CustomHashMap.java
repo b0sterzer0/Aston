@@ -60,7 +60,7 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
         for (Node<K, V> node : this.buckets) {
             while(node != null) {
                 Node<K, V> next = node.next;
-                int newIndex = getBucketIndex(node.key);
+                int newIndex = getBucketIndex(node.getKey());
                 node.next = null;
                 if (newBuckets[newIndex] == null) newBuckets[newIndex] = node;
                 else {
@@ -74,19 +74,33 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
     }
 
     @Override
+    public int size() {
+        return this.size;
+    }
+
+    @Override
     public V get(Object key) {
         V result = null;
         int keyHash = hash(key);
         int bucketIndex = getBucketIndex(key);
+
         Node<K, V> currentNode = this.buckets[bucketIndex];
+
         while (currentNode != null) {
-            if (currentNode.hash == keyHash && (currentNode.key == key || currentNode.key.equals(key))) {
-                result = currentNode.value;
+            if (currentNode.hash == keyHash && (currentNode.getKey() == key || currentNode.getKey().equals(key))) {
+                result = currentNode.getValue();
                 break;
             }
             currentNode = currentNode.next;
         }
+
         return result;
+    }
+
+    @Override
+    public V getOrDefault(Object key, V defaultValue) {
+        V result = get(key);
+        return result == null ? defaultValue : result;
     }
 
     @Override
@@ -98,7 +112,7 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
         Node<K, V> prevNode = null;
 
         while (currentNode != null) {
-            if (currentNode.hash == keyHash && (currentNode.key == key || key.equals(currentNode.key))) {
+            if (currentNode.hash == keyHash && (currentNode.getKey() == key || key.equals(currentNode.getKey()))) {
                 currentNode.setValue(value);
                 return value;
             }
@@ -121,7 +135,26 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
 
     @Override
     public V remove(Object key) {
-        return null;
+        V value = null;
+        int bucketIndex = getBucketIndex(key);
+        int keyHash = hash(key);
+
+        Node<K, V> currentNode = this.buckets[bucketIndex];
+        Node<K, V> prevNode = null;
+
+        while (currentNode != null) {
+            if (currentNode.hash == keyHash && (currentNode.key == key || currentNode.key.equals(key))) {
+                value = currentNode.getValue();
+                if (prevNode == null) this.buckets[bucketIndex] = currentNode.next;
+                else prevNode.next = currentNode.next;
+                this.size--;
+                break;
+            }
+            prevNode = currentNode;
+            currentNode = currentNode.next;
+        }
+
+        return value;
     }
 
     static class Node<K, V> implements Map.Entry<K, V> {
