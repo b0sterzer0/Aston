@@ -38,6 +38,7 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
     }
 
     static final int hash(Object key) {
+        if (key == null) return 0;
         int h = key.hashCode();
         return h ^ (h >>> 16);
     }
@@ -46,37 +47,76 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
         this.buckets = new Node[this.capacity];
     }
 
-    private int getBucketIndex(K key) {
+    private int getBucketIndex(Object key) {
         if (key == null) return 0;
         int hash = hash(key);
-        return (this.buckets.length - 1) & hash;
+        return (this.capacity - 1) & hash;
     }
 
     private void resize() {
-        Node<K,V>[] newBuckets = new Node[this.capacity * 2];
-        for (int i = 0; i < this.buckets.length; i++) {
-            if (this.buckets[i] == null) continue;
-            newBuckets[i] = this.buckets[i];
+        this.capacity *= 2;
+        Node<K,V>[] newBuckets = new Node[this.capacity];
+
+        for (Node<K, V> node : this.buckets) {
+            while(node != null) {
+                Node<K, V> next = node.next;
+                int newIndex = getBucketIndex(node.key);
+                node.next = null;
+                if (newBuckets[newIndex] == null) newBuckets[newIndex] = node;
+                else {
+                    node.next = newBuckets[newIndex];
+                    newBuckets[newIndex] = node;
+                }
+                node = next;
+            }
         }
         this.buckets = newBuckets;
     }
 
     @Override
     public V get(Object key) {
-        return null;
+        V result = null;
+        int keyHash = hash(key);
+        int bucketIndex = getBucketIndex(key);
+        Node<K, V> currentNode = this.buckets[bucketIndex];
+        while (currentNode != null) {
+            if (currentNode.hash == keyHash && (currentNode.key == key || currentNode.key.equals(key))) {
+                result = currentNode.value;
+                break;
+            }
+            currentNode = currentNode.next;
+        }
+        return result;
     }
 
     @Override
     public V put(K key, V value) {
         int bucketIndex = getBucketIndex(key);
-        if ((this.size + 1) >= (this.buckets.length * this.loadFactor)) resize();
-        if (this.buckets[bucketIndex] == null) {
-            this.buckets[bucketIndex] = new Node<K, V>(hash(key), key, value, null);
+        int keyHash = hash(key);
+
+        Node<K, V> currentNode = this.buckets[bucketIndex];
+        Node<K, V> prevNode = null;
+
+        while (currentNode != null) {
+            if (currentNode.hash == keyHash && (currentNode.key == key || key.equals(currentNode.key))) {
+                currentNode.setValue(value);
+                return value;
+            }
+            prevNode = currentNode;
+            currentNode = currentNode.next;
         }
-        else {}
+
+        if ((this.size + 1) >= (this.buckets.length * this.loadFactor)) {
+            resize();
+            bucketIndex = getBucketIndex(key);
+        }
+
+        if (this.buckets[bucketIndex] == null) {
+            this.buckets[bucketIndex] = new Node<>(keyHash, key, value, null);
+        } else prevNode.next = new Node<>(keyHash, key, value, null);
 
         this.size++;
-        return null;
+        return value;
     }
 
     @Override
