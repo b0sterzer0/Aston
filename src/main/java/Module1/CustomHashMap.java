@@ -11,9 +11,9 @@ import java.util.*;
  * @param <V> тип значений
  */
 public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
-    static final int DEFAULT_INITIAL_CAPACITY = 16;
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    static final int MAX_CAPACITY = 1 << 30;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int MAX_CAPACITY = 1 << 30;
 
     private Node<K, V>[] buckets;
     private int size = 0;
@@ -32,6 +32,7 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
         if (initialCapacity > MAX_CAPACITY) initialCapacity = MAX_CAPACITY;
 
         this.capacity = initialCapacity;
+        this.loadFactor = DEFAULT_LOAD_FACTOR;
         initBuckets();
     }
 
@@ -75,7 +76,11 @@ public class CustomHashMap<K, V> extends AbstractCustomHashMap<K, V> {
      * Вызывается автоматически при достижении порога (size > buckets.length * loadFactor).
      */
     private void resize() {
-        this.capacity *= 2;
+        if (this.capacity * 2 > MAX_CAPACITY) {
+            this.capacity = MAX_CAPACITY;
+        }
+        else this.capacity *= 2;
+
         Node<K,V>[] newBuckets = new Node[this.capacity];
 
         for (Node<K, V> node : this.buckets) {
