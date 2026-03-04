@@ -3,6 +3,7 @@ package Module2.models;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
@@ -55,5 +56,30 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (!(obj instanceof User)) return false;
+        User user = (User) obj;
+        return this.id != 0 && this.id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ID: %d Username: %s Email: %s Age: %d, CreatedAt: %s",
+                id,
+                name,
+                email,
+                age,
+                createdAt
+        );
     }
 }
