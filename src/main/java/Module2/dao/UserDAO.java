@@ -8,51 +8,57 @@ import org.hibernate.Transaction;
 import Module2.config.HibernateConfig;
 import Module2.models.User;
 
-public class UserDAO {
-    public void create(User user) {
+public class UserDAO implements DaoInterface<User> {
+    public User create(User user) {
+        Transaction tx = null;
         try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            Transaction tx = session.beginTransaction();
+            tx = session.beginTransaction();
             session.persist(user);
             tx.commit();
-        }
-    }
-
-    public List<User> getUsers() {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            Transaction tx = session.beginTransaction();
-            List<User> users = session.createQuery("from User").list();
-            return  users;
-        }
-    }
-
-    public User getUser(long id) {
-        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            Transaction tx = session.beginTransaction();
-            User user = session.find(User.class, id);
-            if (user == null) throw new IllegalArgumentException("User with id " + id + " is not found");
             return user;
+        } catch (Exception e) {
+            if  (tx != null) tx.rollback();
+            throw e;
         }
     }
 
-    public User update(long id, User updatedUser) {
+    public List<User> getAll() {
         try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            Transaction tx = session.beginTransaction();
-            User userForUpdate = session.find(User.class, id);
-            if (userForUpdate == null) throw new IllegalArgumentException("User with id " + id + " is not found");
-            userForUpdate.setName(updatedUser.getName());
-            userForUpdate.setEmail(updatedUser.getEmail());
-            userForUpdate.setAge(updatedUser.getAge());
+            return session.createQuery("from User", User.class).list();
+        }
+    }
+
+    public User get(long id) {
+        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+            return session.find(User.class, id);
+        }
+    }
+
+    public User update(User userForUpdate) {
+        Transaction tx = null;
+        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            User updatedUser = session.merge(userForUpdate);
             tx.commit();
-            return userForUpdate;
+            return updatedUser;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 
-    public void delete(long id) {
+    public User delete(long id) {
+        Transaction tx = null;
         try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-            Transaction tx = session.beginTransaction();
+            tx = session.beginTransaction();
             User user = session.find(User.class, id);
+            if (user == null) return null;
             session.remove(user);
             tx.commit();
+            return user;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 }
