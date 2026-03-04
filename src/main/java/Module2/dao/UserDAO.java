@@ -19,9 +19,10 @@ public class UserDAO {
 
     public List<User> getUsers() {
         try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-
+            Transaction tx = session.beginTransaction();
+            List<User> users = session.createQuery("from User").list();
+            return  users;
         }
-        return null;
     }
 
     public User getUser(long id) {
