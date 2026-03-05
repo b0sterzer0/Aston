@@ -59,6 +59,7 @@ public class UserService {
     public UserDTO createUser(UserDTO userDTO) {
         LOGGER.info("Request to create new User");
         User user = getUserFromDTO(userDTO);
+        user.setCreatedAt(LocalDateTime.now());
         User addedUser = userDAO.create(user);
         return getUserDtoFromUser(addedUser);
     }
@@ -70,9 +71,9 @@ public class UserService {
             LOGGER.warn("Updating failed. User with id {} not found", id);
             throw new IllegalArgumentException("User with id " + id + " is not found");
         }
-        userForUpdate.setName(userDTO.getName());
-        userForUpdate.setEmail(userDTO.getEmail());
-        userForUpdate.setAge(userDTO.getAge());
+        if (userDTO.getName() != null) userForUpdate.setName(userDTO.getName());
+        if (userDTO.getEmail() != null) userForUpdate.setEmail(userDTO.getEmail());
+        if (userDTO.getAge() >= 0) userForUpdate.setAge(userDTO.getAge());
         User updatedUser = userDAO.update(userForUpdate);
         return getUserDtoFromUser(updatedUser);
     }

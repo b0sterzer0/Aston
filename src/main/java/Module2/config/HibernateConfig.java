@@ -14,7 +14,6 @@ public class HibernateConfig {
     static {
         String dbUrl = constructUrlToDatabase();
         Configuration configuration = new Configuration();
-        configuration.configure();
         configuration.setProperty("hibernate.connection.url", dbUrl);
         configuration.addAnnotatedClass(User.class);
         sessionFactory = configuration.buildSessionFactory();
