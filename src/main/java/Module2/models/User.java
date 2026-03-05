@@ -26,6 +26,10 @@ public class User {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -59,12 +63,11 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (!(obj instanceof User)) return false;
-        User user = (User) obj;
-        return this.id != 0 && this.id == user.id;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id != 0 && id == user.id;
     }
 
     @Override
