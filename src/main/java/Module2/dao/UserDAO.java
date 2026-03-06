@@ -2,6 +2,8 @@ package Module2.dao;
 
 import java.util.List;
 
+import Module2.exceptions.UserDaoException;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -10,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import Module2.config.HibernateConfig;
 import Module2.models.User;
 
-public class UserDAO implements DaoInterface<User> {
+public class UserDAO implements UserDaoInterface {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDAO.class);
 
     public User create(User user) {
@@ -22,10 +24,10 @@ public class UserDAO implements DaoInterface<User> {
             tx.commit();
             LOGGER.info("User created with id: {}",  user.getId());
             return user;
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if  (tx != null) tx.rollback();
             LOGGER.error("User creation failed", e);
-            throw e;
+            throw new UserDaoException("Failed to create user", e);
         }
     }
 
@@ -55,10 +57,10 @@ public class UserDAO implements DaoInterface<User> {
             tx.commit();
             LOGGER.info("Successful updating User with ID: {}",  userForUpdate.getId());
             return updatedUser;
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) tx.rollback();
             LOGGER.error("User update failed with ID: {}",  userForUpdate.getId(), e);
-            throw e;
+            throw new UserDaoException("Failed to update user", e);
         }
     }
 
@@ -69,17 +71,16 @@ public class UserDAO implements DaoInterface<User> {
             tx = session.beginTransaction();
             User user = session.find(User.class, id);
             if (user == null) {
-                tx.rollback();
                 return null;
             }
             session.remove(user);
             tx.commit();
             LOGGER.info("Successful deleting User with ID: {}",  user.getId());
             return user;
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (tx != null) tx.rollback();
             LOGGER.error("Deleting User with ID: {} failed",  id, e);
-            throw e;
+            throw new UserDaoException("Failed to delete user", e);
         }
     }
 }

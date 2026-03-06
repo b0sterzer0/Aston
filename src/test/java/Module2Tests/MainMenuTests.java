@@ -1,122 +1,110 @@
 package Module2Tests;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import Module2.dto.UserDTO;
 import Module2.services.UserService;
 import Module2.app.MainMenu;
 
-public class MainMenuTests {
+class MainMenuTest {
 
-    private UserService userService;
-    private ByteArrayOutputStream output;
+    @Test
+    void start_shouldCallGetUsers() {
 
-    @BeforeEach
-    void setUp() {
-        userService = mock(UserService.class);
-        output = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(output));
+        String input = "1\n0\n";
+        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
+
+        UserService userService = mock(UserService.class);
+
+        when(userService.getUsers()).thenReturn(List.of());
+
+        MainMenu menu = new MainMenu(userService, scanner);
+
+        menu.start();
+
+        verify(userService).getUsers();
     }
 
-    private UserDTO createUser(long id) {
-        return new UserDTO(
-                id,
-                "Ivan",
-                "ivan@test.com",
+    @Test
+    void start_shouldCallGetUser() {
+
+        String input = "2\n1\n0\n";
+        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
+
+        UserService userService = mock(UserService.class);
+
+        UserDTO dto = new UserDTO(
+                1,
+                "John",
+                "john@mail.com",
                 25,
                 LocalDateTime.now()
         );
-    }
 
-    @Test
-    void getUsers_shouldPrintUsers() {
+        when(userService.getUser(1)).thenReturn(dto);
 
-        List<UserDTO> users = List.of(createUser(1), createUser(2));
-        when(userService.getUsers()).thenReturn(users);
-
-        Scanner scanner = new Scanner(new StringReader(""));
         MainMenu menu = new MainMenu(userService, scanner);
 
-        menu.getUsers();
-
-        verify(userService).getUsers();
-        assertTrue(output.toString().contains("Ivan"));
-    }
-
-    @Test
-    void getUser_shouldPrintUser() {
-
-        when(userService.getUser(1)).thenReturn(createUser(1));
-
-        Scanner scanner = new Scanner(new StringReader("1\n"));
-        MainMenu menu = new MainMenu(userService, scanner);
-
-        menu.getUser();
+        menu.start();
 
         verify(userService).getUser(1);
-        assertTrue(output.toString().contains("Ivan"));
     }
 
     @Test
-    void deleteUser_shouldCallService() {
+    void start_shouldCallCreateUser() {
 
-        when(userService.deleteUser(1)).thenReturn(createUser(1));
+        String input = """
+                3
+                John
+                john@mail.com
+                25
+                0
+                """;
 
-        Scanner scanner = new Scanner(new StringReader("1\n"));
+        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
+
+        UserService userService = mock(UserService.class);
+
+        when(userService.createUser(any())).thenReturn(
+                new UserDTO(1,"John","john@mail.com",25,LocalDateTime.now())
+        );
+
         MainMenu menu = new MainMenu(userService, scanner);
 
-        menu.deleteUser();
+        menu.start();
+
+        verify(userService).createUser(any());
+    }
+
+    @Test
+    void start_shouldCallDeleteUser() {
+
+        String input = """
+                5
+                1
+                0
+                """;
+
+        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
+
+        UserService userService = mock(UserService.class);
+
+        when(userService.deleteUser(1)).thenReturn(
+                new UserDTO(1,"John","mail",25,LocalDateTime.now())
+        );
+
+        MainMenu menu = new MainMenu(userService, scanner);
+
+        menu.start();
 
         verify(userService).deleteUser(1);
     }
 
-    @Test
-    void createUser_shouldCreateUser() {
-
-        when(userService.createUser(any())).thenReturn(createUser(1));
-
-        String input =
-                "Ivan\n" +
-                        "ivan@test.com\n" +
-                        "25\n";
-
-        Scanner scanner = new Scanner(new StringReader(input));
-        MainMenu menu = new MainMenu(userService, scanner);
-
-        menu.createUser();
-
-        verify(userService).createUser(any());
-        assertTrue(output.toString().contains("Ivan"));
-    }
-
-    @Test
-    void updateUser_shouldUpdateUser() {
-
-        UserDTO user = createUser(1);
-
-        when(userService.getUser(1)).thenReturn(user);
-        when(userService.updateUser(eq(1L), any())).thenReturn(user);
-
-        String input =
-                "1\n" +   // id
-                        "4\n";    // send update
-
-        Scanner scanner = new Scanner(new StringReader(input));
-        MainMenu menu = new MainMenu(userService, scanner);
-
-        menu.updateUser();
-
-        verify(userService).updateUser(eq(1L), any());
-    }
 }

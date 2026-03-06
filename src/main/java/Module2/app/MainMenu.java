@@ -16,30 +16,25 @@ public class MainMenu {
         this.scanner = scanner;
     }
 
-    public static void main(String[] args) {
-        UserDAO userDAO = new UserDAO();
-        UserService userService = new UserService(userDAO);
-        Scanner scanner = new Scanner(System.in);
-        MainMenu mainMenu = new MainMenu(userService, scanner);
-
+    public void start() {
         while (true) {
             printMenu();
             switch (scanner.nextLine()) {
                 case "0" : return;
                 case "1":
-                    mainMenu.getUsers();
+                    getUsers();
                     break;
                 case "2":
-                    mainMenu.getUser();
+                    getUser();
                     break;
                 case "3":
-                    mainMenu.createUser();
+                    createUser();
                     break;
                 case "4":
-                    mainMenu.updateUser();
+                    updateUser();
                     break;
                 case "5":
-                    mainMenu.deleteUser();
+                    deleteUser();
                     break;
                 default:
                     System.out.println("Такого действия нет!");
@@ -47,25 +42,25 @@ public class MainMenu {
         }
     }
 
-    public void getUsers() {
+    private void getUsers() {
         List<UserDTO> userList = userService.getUsers();
         userList.forEach(System.out::println);
     }
 
-    public void getUser() {
+    private void getUser() {
         System.out.println("Введите id пользователя:");
         long id = Long.parseLong(scanner.nextLine());
         UserDTO user = userService.getUser(id);
         System.out.println(user);
     }
 
-    public void deleteUser() {
+    private void deleteUser() {
         System.out.println("Введите id пользователя:");
         long id = Long.parseLong(scanner.nextLine());
         System.out.println(userService.deleteUser(id));
     }
 
-    public void createUser() {
+    private void createUser() {
         System.out.println("Введите имя пользователя:");
         String name = scanner.nextLine();
         System.out.println("Введите электронную почту:");
@@ -77,7 +72,7 @@ public class MainMenu {
         System.out.println(createdUser);
     }
 
-    public void updateUser() {
+    private void updateUser() {
         System.out.println("Введите id пользователя:");
         long id = Long.parseLong(scanner.nextLine());
 

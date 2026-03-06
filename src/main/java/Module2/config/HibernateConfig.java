@@ -9,32 +9,28 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class HibernateConfig {
-    private static final SessionFactory sessionFactory;
-    private static final Properties dbProperties = new Properties();
+    private static final SessionFactory sessionFactory = createSessionFactory();
 
-    static {
-        String dbUrl = constructUrlToDatabase();
-        Configuration configuration = new Configuration();
-        configuration.setProperty("hibernate.connection.url", dbUrl);
-        configuration.setProperty("hibernate.connection.username", dbProperties.getProperty("db.username"));
-        configuration.setProperty("hibernate.connection.password", dbProperties.getProperty("db.password"));
-        configuration.addAnnotatedClass(User.class);
-        sessionFactory = configuration.buildSessionFactory();
-    }
-
-    private static String constructUrlToDatabase() {
+    private static SessionFactory createSessionFactory() {
         try (InputStream in = HibernateConfig.class.getClassLoader().getResourceAsStream("database.properties")) {
             if (in == null) throw new IllegalStateException("Cannot find database properties file.");
+            Properties dbProperties = new Properties();
             dbProperties.load(in);
-            String host = dbProperties.getProperty("db.host");
-            String port = dbProperties.getProperty("db.port");
-            String dbName = dbProperties.getProperty("db.db_name");
+            String dbUrl = String.format("jdbc:postgresql://%s:%s/%s",
+                    dbProperties.getProperty("db.host"),
+                    dbProperties.getProperty("db.port"),
+                    dbProperties.getProperty("db.db_name")
+            );
 
-            String urlFormat = "jdbc:postgresql://%s:%s/%s";
-            return String.format(urlFormat, host, port, dbName);
+            Configuration configuration = new Configuration();
+            configuration.setProperty("hibernate.connection.url", dbUrl);
+            configuration.setProperty("hibernate.connection.username", dbProperties.getProperty("db.username"));
+            configuration.setProperty("hibernate.connection.password", dbProperties.getProperty("db.password"));
+            configuration.addAnnotatedClass(User.class);
+            return configuration.buildSessionFactory();
 
         } catch (IOException e) {
-            throw new RuntimeException("Loading database properties failed.", e);
+            throw new ExceptionInInitializerError(e);
         }
     }
 

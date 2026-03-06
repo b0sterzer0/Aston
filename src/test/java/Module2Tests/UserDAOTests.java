@@ -145,7 +145,6 @@ public class UserDAOTests {
             User result = userDAO.delete(1L);
 
             assertNull(result);
-            verify(transaction).rollback();
         }
     }
 }

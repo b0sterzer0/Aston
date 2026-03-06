@@ -1,5 +1,7 @@
 package Module2Tests;
 
+import Module2.exceptions.UserDeletionException;
+import Module2.exceptions.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,7 +67,7 @@ class UserServiceTests {
         when(userDAO.get(1)).thenReturn(null);
 
         assertThrows(
-                IllegalArgumentException.class,
+                UserNotFoundException.class,
                 () -> userService.getUser(1)
         );
     }
@@ -111,7 +113,7 @@ class UserServiceTests {
         UserDTO dto = new UserDTO(0, "Name", "mail@test.com", 20, null);
 
         assertThrows(
-                IllegalArgumentException.class,
+                UserNotFoundException.class,
                 () -> userService.updateUser(1, dto)
         );
     }
@@ -135,7 +137,7 @@ class UserServiceTests {
         when(userDAO.delete(1)).thenReturn(null);
 
         assertThrows(
-                IllegalArgumentException.class,
+                UserDeletionException.class,
                 () -> userService.deleteUser(1)
         );
     }
