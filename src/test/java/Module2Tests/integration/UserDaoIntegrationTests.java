@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserDAOIntegrationTest extends BaseIntegrationTest {
-
     private static final Logger log = LoggerFactory.getLogger(UserDAOIntegrationTest.class);
     private UserDAO userDAO;
 

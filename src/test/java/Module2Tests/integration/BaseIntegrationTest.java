@@ -11,24 +11,21 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 public abstract class BaseIntegrationTest {
-
     private static final Logger log = LoggerFactory.getLogger(BaseIntegrationTest.class);
 
     @Container
     private static final PostgreSQLContainer<?> postgresContainer =
-            new PostgreSQLContainer<>("postgres:15-alpine")
+            new PostgreSQLContainer<>("postgres:latest")
                     .withDatabaseName("testdb")
                     .withUsername("test")
                     .withPassword("test");
 
     @BeforeAll
     static void beforeAll() {
-        // передаем параметры контейнера Hibernate
         System.setProperty("hibernate.connection.url", postgresContainer.getJdbcUrl());
         System.setProperty("hibernate.connection.username", postgresContainer.getUsername());
         System.setProperty("hibernate.connection.password", postgresContainer.getPassword());
 
-        // Hibernate создаст таблицы автоматически
         System.setProperty("hibernate.hbm2ddl.auto", "create-drop");
 
         log.info("Testcontainer started at {}", postgresContainer.getJdbcUrl());
@@ -39,7 +36,6 @@ public abstract class BaseIntegrationTest {
     }
 
     protected void cleanDatabase() {
-
         try (Session session = getSessionFactory().openSession()) {
 
             session.beginTransaction();

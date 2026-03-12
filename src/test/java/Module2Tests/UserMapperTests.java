@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserMapperTest {
-
+public class UserMapperTests {
     @Test
     void toDTO_ShouldMapAllFields() {
         User user = new User();

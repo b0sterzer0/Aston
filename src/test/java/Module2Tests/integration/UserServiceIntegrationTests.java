@@ -17,8 +17,7 @@ public class UserServiceIntegrationTests extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-
-        cleanDatabase(); // из BaseIntegrationTest
+        cleanDatabase();
 
         userDAO = new UserDAO();
         userService = new UserService(userDAO);
@@ -26,7 +25,6 @@ public class UserServiceIntegrationTests extends BaseIntegrationTest {
 
     @Test
     void createAndGetUser_ShouldWork() {
-
         UserDTO createDTO = new UserDTO(0, "Integration User", "integration@test.com", 28, null);
 
         UserDTO created = userService.createUser(createDTO);
@@ -44,7 +42,6 @@ public class UserServiceIntegrationTests extends BaseIntegrationTest {
 
     @Test
     void updateUser_ShouldModifyExistingUser() {
-
         UserDTO created = userService.createUser(
                 new UserDTO(0, "Update User", "update@test.com", 30, null)
         );
@@ -62,7 +59,6 @@ public class UserServiceIntegrationTests extends BaseIntegrationTest {
 
     @Test
     void deleteUser_ShouldRemoveUser() {
-
         UserDTO created = userService.createUser(
                 new UserDTO(0, "Delete User", "delete@test.com", 22, null)
         );
@@ -79,7 +75,6 @@ public class UserServiceIntegrationTests extends BaseIntegrationTest {
 
     @Test
     void getUsers_ShouldReturnAllUsers() {
-
         userService.createUser(
                 new UserDTO(0, "User1", "user1@test.com", 25, null)
         );
@@ -95,7 +90,6 @@ public class UserServiceIntegrationTests extends BaseIntegrationTest {
 
     @Test
     void getUser_WithNonExistentId_ShouldThrowException() {
-
         assertThrows(
                 UserNotFoundException.class,
                 () -> userService.getUser(99999L)
