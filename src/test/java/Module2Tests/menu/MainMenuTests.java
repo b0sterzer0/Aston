@@ -1,4 +1,4 @@
-package Module2Tests;
+package Module2Tests.menu;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ import Module2.dto.UserDTO;
 import Module2.services.UserService;
 import Module2.app.MainMenu;
 
-class MainMenuTest {
+public class MainMenuTests {
 
     @Test
     void start_shouldCallGetUsers() {

@@ -1,4 +1,4 @@
-package Module2Tests;
+package Module2Tests.mappers;
 
 import Module2.dto.UserDTO;
 import Module2.mappers.UserMapper;

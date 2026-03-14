@@ -1,4 +1,4 @@
-package Module2Tests;
+package Module2Tests.services;
 
 import Module2.exceptions.UserDeletionException;
 import Module2.exceptions.UserNotFoundException;

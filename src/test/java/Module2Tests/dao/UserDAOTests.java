@@ -1,4 +1,4 @@
-package Module2Tests;
+package Module2Tests.dao;
 
 import Module2.config.HibernateConfig;
 
