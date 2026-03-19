@@ -104,6 +104,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-test -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>7.0.6</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-context -->
         <dependency>
@@ -190,6 +198,22 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <version>3.1.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path -->
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
