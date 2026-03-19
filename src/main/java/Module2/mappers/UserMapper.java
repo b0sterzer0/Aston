@@ -2,9 +2,11 @@ package Module2.mappers;
 
 import Module2.dto.UserDTO;
 import Module2.models.User;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Component
 public class UserMapper {
     public UserDTO toDTO (User user) {
         return new UserDTO(

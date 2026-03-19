@@ -1,15 +1,12 @@
 package Module2.app;
 
-import Module2.services.UserService;
-
-import java.util.Scanner;
+import Module2.config.AppConfig;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 public class App {
-    public static void main(String[] args) {
-//        UserDAO userDAO = new UserDAO();
-//        UserService userService = new UserService(userDAO);
-//        Scanner scanner = new Scanner(System.in);
-//        MainMenu mainMenu = new MainMenu(userService, scanner);
-//        mainMenu.start();
+    public static void main(String[] args) throws Exception {
+        AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
+        context.register(AppConfig.class);
+        context.refresh();
     }
 }

@@ -9,5 +9,5 @@ public interface ServiceInterface<T extends DtoInterface> {
     T getEntity(long id);
     T createEntity(T dto);
     T updateEntity(long id, T dto);
-    T deleteEntity(long id);
+    void deleteEntity(long id);
 }

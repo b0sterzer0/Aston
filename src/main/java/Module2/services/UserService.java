@@ -71,14 +71,12 @@ public class UserService implements ServiceInterface<UserDTO> {
     }
 
     @Transactional
-    public UserDTO deleteEntity(long id) {
+    public void deleteEntity(long id) {
         LOGGER.info("Request to delete User with id {}", id);
         User user = userRepository.findById(id).orElseThrow(() -> {
             LOGGER.warn("Deletion User failed. User with id {} not found", id);
             return new UserDeletionException(id);
         });
-        UserDTO dto = userMapper.toDTO(user);
         userRepository.delete(user);
-        return dto;
     }
 }
