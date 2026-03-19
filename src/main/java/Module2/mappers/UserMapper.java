@@ -1,10 +1,9 @@
 package Module2.mappers;
 
+import Module2.dto.UserDtoInterface;
 import Module2.dto.UserDTO;
 import Module2.models.User;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public class UserMapper {
@@ -18,12 +17,11 @@ public class UserMapper {
         );
     }
 
-    public User toUser (UserDTO userDTO) {
+    public User toUser (UserDtoInterface userDTO) {
         User user = new User();
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setAge(userDTO.getAge());
-        user.setCreatedAt(LocalDateTime.now());
         return user;
     }
 }

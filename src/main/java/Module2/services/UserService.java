@@ -3,6 +3,7 @@ package Module2.services;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import Module2.dto.UpdateUserDto;
 import Module2.exceptions.UserDeletionException;
 import Module2.exceptions.UserNotFoundException;
 import Module2.repositories.UserRepository;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import Module2.dto.UserDTO;
+import Module2.dto.CreateUserDto;
 import Module2.models.User;
 import Module2.mappers.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UserService implements ServiceInterface<UserDTO> {
+public class UserService implements UserServiceInterface {
     private final static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -49,7 +51,7 @@ public class UserService implements ServiceInterface<UserDTO> {
     }
 
     @Transactional
-    public UserDTO createEntity(UserDTO userDTO) {
+    public UserDTO createEntity(CreateUserDto userDTO) {
         LOGGER.info("Request to create new User");
         User user = userMapper.toUser(userDTO);
         user.setCreatedAt(LocalDateTime.now());
@@ -58,15 +60,15 @@ public class UserService implements ServiceInterface<UserDTO> {
     }
 
     @Transactional
-    public UserDTO updateEntity(long id, UserDTO userDTO) {
+    public UserDTO updateEntity(long id, UpdateUserDto userDto) {
         LOGGER.info("Request to update User with id {}", id);
         User user = userRepository.findById(id).orElseThrow(() -> {
             LOGGER.warn("Updating User failed. User with id {} not found", id);
             return new UserNotFoundException(id);
         });
-        if (userDTO.getName() != null) user.setName(userDTO.getName());
-        if (userDTO.getEmail() != null) user.setEmail(userDTO.getEmail());
-        if (userDTO.getAge() >= 0) user.setAge(userDTO.getAge());
+        if (userDto.getName() != null) user.setName(userDto.getName());
+        if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
+        if (userDto.getAge() >= 0) user.setAge(userDto.getAge());
         return userMapper.toDTO(user);
     }
 

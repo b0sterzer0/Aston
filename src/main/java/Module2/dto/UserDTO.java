@@ -3,7 +3,7 @@ package Module2.dto;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class UserDTO implements DtoInterface {
+public class UserDTO implements UserDtoInterface {
     private final long id;
     private final String name;
     private final String email;
@@ -30,7 +30,7 @@ public class UserDTO implements DtoInterface {
         return email;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
