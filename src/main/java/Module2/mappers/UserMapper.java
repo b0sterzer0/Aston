@@ -6,7 +6,7 @@ import Module2.models.User;
 import java.time.LocalDateTime;
 
 public class UserMapper {
-    public static UserDTO toDTO (User user) {
+    public UserDTO toDTO (User user) {
         return new UserDTO(
                 user.getId(),
                 user.getName(),
@@ -16,7 +16,7 @@ public class UserMapper {
         );
     }
 
-    public static User toUser (UserDTO userDTO) {
+    public User toUser (UserDTO userDTO) {
         User user = new User();
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());

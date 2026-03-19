@@ -5,68 +5,80 @@ import java.util.List;
 
 import Module2.exceptions.UserDeletionException;
 import Module2.exceptions.UserNotFoundException;
+import Module2.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import Module2.dao.UserDaoInterface;
 import Module2.dto.UserDTO;
 import Module2.models.User;
 import Module2.mappers.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-
-public class UserService {
+@Service
+public class UserService implements ServiceInterface<UserDTO> {
     private final static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-    private final UserDaoInterface userDAO;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserService(UserDaoInterface userDAO) {
-        this.userDAO = userDAO;
+    @Autowired
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
-    public List<UserDTO> getUsers() {
+    @Transactional(readOnly = true)
+    public List<UserDTO> getAllEntities() {
         LOGGER.debug("Request to get all users");
-        List<User> usersFromDB = userDAO.getAll();
+        List<User> usersFromDB = userRepository.findAll();
         if (usersFromDB.isEmpty()) LOGGER.debug("Returned User list is empty");
         return usersFromDB.stream()
-                .map(UserMapper::toDTO)
+                .map(userMapper::toDTO)
                 .toList();
     }
 
-    public UserDTO getUser(long id) {
+    @Transactional(readOnly = true)
+    public UserDTO getEntity(long id) {
         LOGGER.debug("Request to get User with id {}", id);
-        User user = userDAO.get(id);
-        if (user == null) {
+        User user = userRepository.findById(id).orElseThrow(() -> {
             LOGGER.warn("User with id {} not found", id);
-            throw new UserNotFoundException(id);
-        }
-        return UserMapper.toDTO(user);
+            return new UserNotFoundException(id);
+        });
+        return userMapper.toDTO(user);
     }
 
-    public UserDTO createUser(UserDTO userDTO) {
+    @Transactional
+    public UserDTO createEntity(UserDTO userDTO) {
         LOGGER.info("Request to create new User");
-        User user = UserMapper.toUser(userDTO);
+        User user = userMapper.toUser(userDTO);
         user.setCreatedAt(LocalDateTime.now());
-        User addedUser = userDAO.create(user);
-        return UserMapper.toDTO(addedUser);
+        User addedUser = userRepository.save(user);
+        return userMapper.toDTO(addedUser);
     }
 
-    public UserDTO updateUser(long id, UserDTO userDTO) {
+    @Transactional
+    public UserDTO updateEntity(long id, UserDTO userDTO) {
         LOGGER.info("Request to update User with id {}", id);
-        User userForUpdate = userDAO.get(id);
-        if  (userForUpdate == null) {
-            LOGGER.warn("Updating failed. User with id {} not found", id);
-            throw new UserNotFoundException(id);
-        }
-        if (userDTO.getName() != null) userForUpdate.setName(userDTO.getName());
-        if (userDTO.getEmail() != null) userForUpdate.setEmail(userDTO.getEmail());
-        if (userDTO.getAge() >= 0) userForUpdate.setAge(userDTO.getAge());
-        User updatedUser = userDAO.update(userForUpdate);
-        return UserMapper.toDTO(updatedUser);
+        User user = userRepository.findById(id).orElseThrow(() -> {
+            LOGGER.warn("Updating User failed. User with id {} not found", id);
+            return new UserNotFoundException(id);
+        });
+        if (userDTO.getName() != null) user.setName(userDTO.getName());
+        if (userDTO.getEmail() != null) user.setEmail(userDTO.getEmail());
+        if (userDTO.getAge() >= 0) user.setAge(userDTO.getAge());
+        return userMapper.toDTO(user);
     }
 
-    public UserDTO deleteUser(long id) {
+    @Transactional
+    public UserDTO deleteEntity(long id) {
         LOGGER.info("Request to delete User with id {}", id);
-        User user = userDAO.delete(id);
-        if (user == null) throw new UserDeletionException(id);
-        return UserMapper.toDTO(user);
+        User user = userRepository.findById(id).orElseThrow(() -> {
+            LOGGER.warn("Deletion User failed. User with id {} not found", id);
+            return new UserDeletionException(id);
+        });
+        UserDTO dto = userMapper.toDTO(user);
+        userRepository.delete(user);
+        return dto;
     }
 }
