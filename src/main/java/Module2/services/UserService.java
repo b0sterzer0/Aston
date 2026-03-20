@@ -68,7 +68,7 @@ public class UserService implements UserServiceInterface {
         });
         if (userDto.getName() != null) user.setName(userDto.getName());
         if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
-        if (userDto.getAge() >= 0) user.setAge(userDto.getAge());
+        if (userDto.getAge() != null) user.setAge(userDto.getAge());
         return userMapper.toDTO(user);
     }
 
