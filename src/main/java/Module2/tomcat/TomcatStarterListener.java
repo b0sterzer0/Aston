@@ -22,24 +22,20 @@ public class TomcatStarterListener implements ApplicationListener<ContextRefresh
         if (!started.compareAndSet(false, true)) return;
 
         try {
-            WebApplicationContext rootContext =
-                    (WebApplicationContext) event.getApplicationContext();
+            WebApplicationContext rootContext = (WebApplicationContext) event.getApplicationContext();
 
             Tomcat tomcat = new Tomcat();
             tomcat.setPort(8080);
             tomcat.getConnector();
 
-            Context tomcatContext =
-                    tomcat.addContext("", new File(".").getAbsolutePath());
+            Context tomcatContext = tomcat.addContext("", new File(".").getAbsolutePath());
 
-            AnnotationConfigWebApplicationContext mvcContext =
-                    new AnnotationConfigWebApplicationContext();
+            AnnotationConfigWebApplicationContext mvcContext = new AnnotationConfigWebApplicationContext();
 
             mvcContext.register(Module2.config.WebConfig.class);
             mvcContext.setParent(rootContext);
 
-            DispatcherServlet dispatcherServlet =
-                    new DispatcherServlet(mvcContext);
+            DispatcherServlet dispatcherServlet = new DispatcherServlet(mvcContext);
 
             Tomcat.addServlet(tomcatContext, "dispatcher", dispatcherServlet);
             tomcatContext.addServletMappingDecoded("/", "dispatcher");
